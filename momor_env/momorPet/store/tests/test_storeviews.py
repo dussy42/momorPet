@@ -16,6 +16,7 @@ class Test_store_views(TestCase):
         self.remove_from_cart_url = reverse('remove_from_cart')
         self.cart_view_url = reverse('cart_view')
         self.category = Category.objects.create(name='category_detail',)
+        self.product = Product.objects.create(name='product_detail',)
 
     def test_change_quantity_GET(self):
 
@@ -59,3 +60,48 @@ class Test_store_views(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'store/category_detail.html')
         self.assertContains(response, self.category.category_detail)
+
+    def test_product_detail(self):
+        slug = slugify(self.product.product_detail)
+        url = reverse('product_detail', kwargs={'slug': slug})
+        response = self.client.get(url)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'store/product_detail.html')
+        self.assertContains(response, self.product.product_detail)
+
+    def test_checkout_with_valid_data(self):
+        data = {
+            'first_name': 'Momoh',
+            'last_name': 'sam',
+            'address': 'ireland',
+            'zipcode': '98765',
+            'city': 'Dublin',
+        }
+        response = self.client.post(reverse('checkout'), data=data)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue(Order.objects.exists())
+        self.assertTrue(OrderItem.objects.exists())
+
+    def test_checkout_with_invalid_data(self):
+        data = {
+            'first_name': '',
+            'last_name': '',
+            'address': '',
+            'zipcode': '',
+            'city': '',
+        }
+        response = self.client.post(reverse('checkout'), data=data)
+
+        self.assertEquals(response.status_code, 404)
+        self.assertFormError(response, 'form', 'first_name',
+                             'This field is required.')
+        self.assertFormError(response, 'form', 'last_name',
+                             'This field is required.')
+        self.assertFormError(response, 'form', 'address',
+                             'This field is required.')
+        self.assertFormError(response, 'form', 'zipcode',
+                             'This field is required.')
+        self.assertFormError(response, 'form', 'city',
+                             'This field is required.')
