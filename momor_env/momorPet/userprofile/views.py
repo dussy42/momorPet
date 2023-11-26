@@ -5,11 +5,11 @@ from django.utils.text import slugify
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 
-from .models import Userprofile
+from userprofile.models import Userprofile
 from store.forms import ProductForm
 from store.models import Product, Order, OrderItem, Category
 
-# Create your views here.
+
 
 
 def vendor_detail(request, pk):
@@ -124,3 +124,5 @@ def signup(request):
     return render(request, 'userprofile/signup.html', {
         'form': form
     })
+
+

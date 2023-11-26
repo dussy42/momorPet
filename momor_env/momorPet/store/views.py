@@ -11,7 +11,7 @@ from .cart import Cart
 from .forms import OrderForm
 from .models import Category, Product, Order, OrderItem
 
-# Create your views here.
+
 
 
 def add_to_cart(request, product_id):
